@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "487675413409",
+    "project_id": "covoiturage-982d3",
+    "storage_bucket": "covoiturage-982d3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:487675413409:android:a534f89c956dcf3d8c81e0",
+        "android_client_info": {
+          "package_name": "com.nom.covoiturage"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCwYeYZqQ1BvNFKpdA7Z8DrU8uW7UtnKUY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
