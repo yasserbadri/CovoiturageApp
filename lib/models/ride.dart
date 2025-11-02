@@ -38,32 +38,54 @@ class Ride {
   });
 
   factory Ride.fromJson(Map<String, dynamic> json) {
-    return Ride(
-      id: json['id'].toString(),
-      driverId: json['driver_id'].toString(),
-      passengerId: json['passenger_id']?.toString(),
-      startLocation: LatLng(
-        json['start_lat']?.toDouble() ?? 0.0,
-        json['start_lng']?.toDouble() ?? 0.0,
-      ),
-      endLocation: LatLng(
-        json['end_lat']?.toDouble() ?? 0.0,
-        json['end_lng']?.toDouble() ?? 0.0,
-      ),
-      startAddress: json['start_address'] ?? '',
-      endAddress: json['end_address'] ?? '',
-      price: json['price']?.toDouble() ?? 0.0,
-      status: json['status'] ?? 'pending',
-      createdAt: DateTime.parse(json['created_at'] ?? DateTime.now().toIso8601String()),
-      startedAt: json['started_at'] != null ? DateTime.parse(json['started_at']) : null,
-      completedAt: json['completed_at'] != null ? DateTime.parse(json['completed_at']) : null,
-      distance: json['distance']?.toDouble(),
-      duration: json['duration'],
-      driverName: json['driver_name'],
-      driverRating: json['driver_rating']?.toDouble(),
-      vehicleType: json['vehicle_type'],
-    );
+  double? safeParseDouble(dynamic value) {
+    if (value == null) return null;
+    if (value is double) return value;
+    if (value is int) return value.toDouble();
+    if (value is String) return double.tryParse(value);
+    return null;
   }
+
+  int? safeParseInt(dynamic value) {
+    if (value == null) return null;
+    if (value is int) return value;
+    if (value is String) return int.tryParse(value);
+    return null;
+  }
+
+  DateTime? safeParseDateTime(dynamic value) {
+    if (value == null) return null;
+    if (value is DateTime) return value;
+    if (value is String) return DateTime.tryParse(value);
+    return null;
+  }
+
+  return Ride(
+    id: json['id']?.toString() ?? '',
+    driverId: json['driver_id']?.toString() ?? '',
+    passengerId: json['passenger_id']?.toString(),
+    startLocation: LatLng(
+      safeParseDouble(json['start_lat']) ?? 0.0,
+      safeParseDouble(json['start_lng']) ?? 0.0,
+    ),
+    endLocation: LatLng(
+      safeParseDouble(json['end_lat']) ?? 0.0,
+      safeParseDouble(json['end_lng']) ?? 0.0,
+    ),
+    startAddress: json['start_address']?.toString() ?? '',
+    endAddress: json['end_address']?.toString() ?? '',
+    price: safeParseDouble(json['price']) ?? 0.0,
+    status: json['status']?.toString() ?? 'pending',
+    createdAt: safeParseDateTime(json['created_at']) ?? DateTime.now(),
+    startedAt: safeParseDateTime(json['started_at']),
+    completedAt: safeParseDateTime(json['completed_at']),
+    distance: safeParseDouble(json['distance']),
+    duration: safeParseInt(json['duration']),
+    driverName: json['driver_name']?.toString(),
+    driverRating: safeParseDouble(json['driver_rating']),
+    vehicleType: json['vehicle_type']?.toString(),
+  );
+}
 }
 
 class LatLng {

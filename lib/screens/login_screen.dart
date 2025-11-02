@@ -3,6 +3,7 @@ import '../routes/app_routes.dart';
 import '../widgets/custom_textfield.dart';
 import '../widgets/custom_button.dart';
 import '../services/api_service.dart';
+import '../models/user.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -52,14 +53,27 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => isLoading = false);
 
     if (result != null) {
+      final user = result['user'] as User;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Connexion réussie!')),
+        SnackBar(content: Text('Connexion réussie! Bienvenue ${user.name}')),
       );
-      Navigator.pushReplacementNamed(context, AppRoutes.home);
+      
+      // Redirection selon le rôle
+      _redirectBasedOnRole(user);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Échec de la connexion')),
       );
+    }
+  }
+
+  void _redirectBasedOnRole(User user) {
+    if (user.userType == 'chauffeur') {
+      // Rediriger vers l'écran chauffeur
+      Navigator.pushReplacementNamed(context, AppRoutes.driverHome);
+    } else {
+      // Rediriger vers l'écran client (par défaut)
+      Navigator.pushReplacementNamed(context, AppRoutes.clientHome);
     }
   }
 

@@ -5,10 +5,7 @@ import '../models/user.dart';
 import '../models/ride.dart';
 
 class ApiService {
-  // IMPORTANT: Utilisez la bonne URL selon votre plateforme
-  //static const String baseUrl = 'http://10.0.2.2:3000/api'; // Android Emulator
-  // static const String baseUrl = 'http://127.0.0.1:3000/api'; // iOS Simulator
-   static const String baseUrl = 'http://localhost:3000/api'; // Web
+  static const String baseUrl = 'http://localhost:3000/api';
 
   static Future<String?> _getToken() async {
     final prefs = await SharedPreferences.getInstance();
@@ -141,4 +138,107 @@ class ApiService {
       return false;
     }
   }
+
+  // Méthodes temporaires pour le développement
+static Future<User?> getCurrentUser() async {
+  // Simulation - à remplacer par un vrai appel API plus tard
+  await Future.delayed(const Duration(seconds: 1));
+  return User(
+    id: '1',
+    name: 'Utilisateur Test',
+    email: 'test@example.com',
+    userType: 'client',
+    rating: 4.5,
+    totalRides: 10,
+  );
+}
+
+// Méthode pour créer un trajet
+static Future<Ride?> createRide(Ride ride) async {
+  final token = await _getToken();
+  try {
+    print('🔄 Création d\'un trajet...');
+    
+    final response = await http.post(
+      Uri.parse('$baseUrl/rides'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({
+        'start_lat': ride.startLocation.latitude,
+        'start_lng': ride.startLocation.longitude,
+        'end_lat': ride.endLocation.latitude,
+        'end_lng': ride.endLocation.longitude,
+        'start_address': ride.startAddress,
+        'end_address': ride.endAddress,
+        'price': ride.price,
+        'distance': ride.distance,
+        'duration': ride.duration,
+      }),
+    );
+
+    print('📡 Status création: ${response.statusCode}');
+    print('📦 Response création: ${response.body}');
+
+    if (response.statusCode == 201) {
+      final data = jsonDecode(response.body);
+      print('✅ Trajet créé avec succès');
+      return Ride.fromJson(data['ride']);
+    }
+    return null;
+  } catch (e) {
+    print('❌ Erreur création trajet: $e');
+    return null;
+  }
+}
+
+// Méthode pour accepter un trajet
+static Future<bool> acceptRide(String rideId) async {
+  final token = await _getToken();
+  try {
+    print('🔄 Acceptation du trajet $rideId...');
+    
+    final response = await http.post(
+      Uri.parse('$baseUrl/rides/$rideId/accept'),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    print('📡 Status acceptation: ${response.statusCode}');
+
+    if (response.statusCode == 200) {
+      print('✅ Trajet accepté avec succès');
+      return true;
+    }
+    return false;
+  } catch (e) {
+    print('❌ Erreur acceptation trajet: $e');
+    return false;
+  }
+}
+
+// Méthode pour récupérer les trajets de l'utilisateur
+static Future<List<Ride>> getUserRides() async {
+  final token = await _getToken();
+  try {
+    print('🔄 Récupération des trajets utilisateur...');
+    
+    final response = await http.get(
+      Uri.parse('$baseUrl/rides/my-rides'),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      final rides = (data['rides'] as List).map((ride) => Ride.fromJson(ride)).toList();
+      
+      print('✅ ${rides.length} trajets utilisateur récupérés');
+      return rides;
+    }
+    return [];
+  } catch (e) {
+    print('❌ Erreur récupération trajets utilisateur: $e');
+    return [];
+  }
+}
 }

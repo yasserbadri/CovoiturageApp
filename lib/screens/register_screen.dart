@@ -1,3 +1,4 @@
+import 'package:covoituragesite/models/user.dart';
 import 'package:flutter/material.dart';
 import '../widgets/custom_textfield.dart';
 import '../widgets/custom_button.dart';
@@ -49,14 +50,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
     setState(() => isLoading = false);
 
     if (result != null) {
+      final user = result['user'] as User;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Inscription réussie!')),
+        SnackBar(content: Text('Inscription réussie! Bienvenue ${user.name}')),
       );
-      Navigator.pushReplacementNamed(context, AppRoutes.home);
+      
+      // Redirection selon le rôle
+      _redirectBasedOnRole(user);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Échec de l\'inscription')),
       );
+    }
+  }
+
+  // MÉTHODE AJOUTÉE : Redirection selon le rôle
+  void _redirectBasedOnRole(User user) {
+    if (user.userType == 'chauffeur') {
+      Navigator.pushReplacementNamed(context, AppRoutes.driverHome);
+    } else {
+      Navigator.pushReplacementNamed(context, AppRoutes.clientHome);
     }
   }
 
