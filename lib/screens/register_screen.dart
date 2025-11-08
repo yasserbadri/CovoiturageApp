@@ -17,6 +17,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
+  final phoneController = TextEditingController();
+  final vehicleTypeController = TextEditingController();
+  final licensePlateController = TextEditingController();
+
   String userType = 'client';
   bool isLoading = false;
 
@@ -45,6 +49,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
       emailController.text.trim(),
       passwordController.text,
       userType,
+      phone: phoneController.text.trim(),
+      vehicleType: vehicleTypeController.text.trim(),
+      licensePlate: licensePlateController.text.trim(),
     );
 
     setState(() => isLoading = false);
@@ -52,9 +59,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (result != null) {
       final user = result['user'] as User;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Inscription réussie! Bienvenue ${user.name}')),
+        SnackBar(content: Text('Inscription réussie ! Bienvenue ${user.name}')),
       );
-      
+
       // Redirection selon le rôle
       _redirectBasedOnRole(user);
     } else {
@@ -64,7 +71,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
-  // MÉTHODE AJOUTÉE : Redirection selon le rôle
   void _redirectBasedOnRole(User user) {
     if (user.userType == 'chauffeur') {
       Navigator.pushReplacementNamed(context, AppRoutes.driverHome);
@@ -78,8 +84,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Créer un compte"),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
+        backgroundColor: Colors.blueAccent,
+        elevation: 2,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
@@ -93,10 +99,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
               const Icon(Icons.person_add, size: 80, color: Colors.blue),
               const SizedBox(height: 20),
               const Text(
-                "Rejoignez-nous",
+                "Rejoignez notre plateforme",
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 30),
+
+              // --- Champs communs ---
               CustomTextField(
                 controller: nameController,
                 label: "Nom complet",
@@ -121,9 +129,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 obscureText: true,
               ),
               const SizedBox(height: 20),
-              
-              // Sélection du type d'utilisateur
+
+              // --- Type d'utilisateur ---
               Card(
+                elevation: 3,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Column(
@@ -170,9 +182,32 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                 ),
               ),
-              
+
+              // --- Champs spécifiques chauffeur ---
+              if (userType == 'chauffeur') ...[
+                const SizedBox(height: 20),
+                CustomTextField(
+                  controller: phoneController,
+                  label: "Numéro de téléphone",
+                  keyboardType: TextInputType.phone,
+                ),
+                const SizedBox(height: 20),
+                CustomTextField(
+                  controller: vehicleTypeController,
+                  label: "Type de véhicule",
+                  keyboardType: TextInputType.text,
+                ),
+                const SizedBox(height: 20),
+                CustomTextField(
+                  controller: licensePlateController,
+                  label: "Plaque d'immatriculation",
+                  keyboardType: TextInputType.text,
+                ),
+              ],
+
               const SizedBox(height: 30),
-              
+
+              // --- Bouton ---
               if (isLoading)
                 const CircularProgressIndicator()
               else
@@ -180,14 +215,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   text: "S'inscrire",
                   onPressed: _register,
                 ),
-              
+
               const SizedBox(height: 20),
-              
+
               TextButton(
                 onPressed: () {
                   Navigator.pushReplacementNamed(context, AppRoutes.login);
                 },
-                child: const Text("Déjà un compte ? Se connecter"),
+                child: const Text(
+                  "Déjà un compte ? Se connecter",
+                  style: TextStyle(color: Colors.blue),
+                ),
               ),
             ],
           ),
@@ -202,6 +240,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
     emailController.dispose();
     passwordController.dispose();
     confirmPasswordController.dispose();
+    phoneController.dispose();
+    vehicleTypeController.dispose();
+    licensePlateController.dispose();
     super.dispose();
   }
 }

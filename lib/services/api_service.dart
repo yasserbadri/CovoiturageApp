@@ -58,42 +58,63 @@ class ApiService {
     }
   }
 
-  static Future<Map<String, dynamic>?> register(String name, String email, String password, String userType) async {
-    try {
-      print('🔄 Tentative d\'inscription: $email');
-      
-      final response = await http.post(
-        Uri.parse('$baseUrl/auth/register'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'name': name,
-          'email': email,
-          'password': password,
-          'user_type': userType,
-        }),
-      );
+  static Future<Map<String, dynamic>?> register(
+  String name,
+  String email,
+  String password,
+  String userType, {
+  String? phone,
+  String? vehicleType,
+  String? licensePlate,
+}) async {
+  try {
+    print('🔄 Tentative d\'inscription: $email en tant que $userType');
 
-      print('📡 Status: ${response.statusCode}');
-      print('📦 Response: ${response.body}');
+    // Préparer le corps JSON dynamiquement selon le rôle
+    final Map<String, dynamic> body = {
+      'name': name,
+      'email': email,
+      'password': password,
+      'user_type': userType,
+    };
 
-      if (response.statusCode == 201) {
-        final data = jsonDecode(response.body);
-        await _saveToken(data['token']);
-        
-        print('✅ Inscription réussie!');
-        return {
-          'user': User.fromJson(data['user']),
-          'token': data['token'],
-        };
-      } else {
-        print('❌ Erreur HTTP: ${response.statusCode}');
-        return null;
+    if (phone != null && phone.isNotEmpty) body['phone'] = phone;
+    if (userType == 'chauffeur') {
+      if (vehicleType != null && vehicleType.isNotEmpty) {
+        body['vehicle_type'] = vehicleType;
       }
-    } catch (e) {
-      print('❌ Erreur d\'inscription: $e');
+      if (licensePlate != null && licensePlate.isNotEmpty) {
+        body['license_plate'] = licensePlate;
+      }
+    }
+
+    final response = await http.post(
+      Uri.parse('$baseUrl/auth/register'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(body),
+    );
+
+    print('📡 Status: ${response.statusCode}');
+    print('📦 Response: ${response.body}');
+
+    if (response.statusCode == 201 || response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      await _saveToken(data['token']);
+      print('✅ Inscription réussie pour $userType');
+      return {
+        'user': User.fromJson(data['user']),
+        'token': data['token'],
+      };
+    } else {
+      print('❌ Erreur HTTP: ${response.statusCode}');
       return null;
     }
+  } catch (e) {
+    print('❌ Erreur d\'inscription: $e');
+    return null;
   }
+}
+
 
   static Future<void> logout() async {
     await _removeToken();
