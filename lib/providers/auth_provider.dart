@@ -11,6 +11,7 @@ class AuthProvider with ChangeNotifier {
   String? get token => _token;
   bool get isLoading => _isLoading;
   String get userType => _user?.userType ?? 'client';
+  bool get isLoggedIn => _user != null && _token != null;
 
   Future<bool> login(String email, String password) async {
     _isLoading = true;
@@ -67,23 +68,44 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // Méthode temporaire - à implémenter plus tard dans ApiService
+  // CORRECTION : Utiliser getCurrentUser() au lieu de _getToken()
   Future<void> loadCurrentUser() async {
+    _isLoading = true;
+    notifyListeners();
+
     try {
-      // Pour l'instant, on simule un utilisateur
-      _user = User(
-        id: '1',
-        name: 'Utilisateur Test',
-        email: 'test@example.com',
-        userType: 'client',
-        rating: 4.5,
-        totalRides: 10,
-      );
-      notifyListeners();
-    } catch (e) {
-      if (kDebugMode) {
-        print('Erreur chargement utilisateur: $e');
+      // Essayer de récupérer l'utilisateur depuis l'API
+      final user = await ApiService.getCurrentUser();
+      if (user != null) {
+        _user = user;
+        // Le token est géré automatiquement par ApiService via SharedPreferences
+        // On peut essayer de le récupérer si nécessaire avec une méthode publique
+      } else {
+        // Si l'API ne retourne rien, déconnecter l'utilisateur
+        await logout();
       }
+    } catch (e) {
+      print('Erreur chargement utilisateur: $e');
+      // En cas d'erreur, déconnecter pour être sûr
+      await logout();
+    }
+
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  // Méthode pour initialiser l'authentification au démarrage de l'app
+  Future<void> initialize() async {
+    try {
+      // Vérifier si un token existe et est valide
+      final user = await ApiService.getCurrentUser();
+      if (user != null) {
+        _user = user;
+        // Le token est stocké dans SharedPreferences et géré par ApiService
+        notifyListeners();
+      }
+    } catch (e) {
+      print('Erreur initialisation auth: $e');
     }
   }
 }

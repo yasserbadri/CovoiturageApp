@@ -1,3 +1,5 @@
+import 'package:covoituragesite/providers/notification_provider.dart';
+import 'package:covoituragesite/providers/rating_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/auth_provider.dart';
@@ -17,6 +19,9 @@ class CovoiturageApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => RideProvider()),
+        ChangeNotifierProvider(create: (_) => NotificationProvider()), // ← Nouveau
+        ChangeNotifierProvider(create: (_) => RatingProvider()), // ← Nouveau
+
       ],
       child: MaterialApp(
         title: 'Covoiturage App',

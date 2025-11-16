@@ -30,9 +30,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
         passwordController.text.isEmpty ||
         confirmPasswordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Veuillez remplir tous les champs')),
+        const SnackBar(content: Text('Veuillez remplir tous les champs obligatoires')),
       );
       return;
+    }
+
+    // Pour les chauffeurs, vérifier les champs supplémentaires
+    if (userType == 'chauffeur') {
+      if (phoneController.text.isEmpty ||
+          vehicleTypeController.text.isEmpty ||
+          licensePlateController.text.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Veuillez remplir tous les champs pour chauffeur')),
+        );
+        return;
+      }
     }
 
     if (passwordController.text != confirmPasswordController.text) {
@@ -49,9 +61,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
       emailController.text.trim(),
       passwordController.text,
       userType,
-      phone: phoneController.text.trim(),
-      vehicleType: vehicleTypeController.text.trim(),
-      licensePlate: licensePlateController.text.trim(),
+      phone: userType == 'chauffeur' ? phoneController.text.trim() : null, // ← NULL pour client
+      vehicleType: userType == 'chauffeur' ? vehicleTypeController.text.trim() : null,
+      licensePlate: userType == 'chauffeur' ? licensePlateController.text.trim() : null,
     );
 
     setState(() => isLoading = false);
@@ -62,7 +74,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
         SnackBar(content: Text('Inscription réussie ! Bienvenue ${user.name}')),
       );
 
-      // Redirection selon le rôle
       _redirectBasedOnRole(user);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -107,25 +118,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
               // --- Champs communs ---
               CustomTextField(
                 controller: nameController,
-                label: "Nom complet",
+                label: "Nom complet *",
                 keyboardType: TextInputType.text,
               ),
               const SizedBox(height: 20),
               CustomTextField(
                 controller: emailController,
-                label: "Email",
+                label: "Email *",
                 keyboardType: TextInputType.emailAddress,
               ),
               const SizedBox(height: 20),
               CustomTextField(
                 controller: passwordController,
-                label: "Mot de passe",
+                label: "Mot de passe *",
                 obscureText: true,
               ),
               const SizedBox(height: 20),
               CustomTextField(
                 controller: confirmPasswordController,
-                label: "Confirmer le mot de passe",
+                label: "Confirmer le mot de passe *",
                 obscureText: true,
               ),
               const SizedBox(height: 20),
@@ -142,7 +153,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        "Type de compte",
+                        "Type de compte *",
                         style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 10),
@@ -151,6 +162,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           Expanded(
                             child: ListTile(
                               title: const Text('Passager'),
+                              subtitle: const Text('Réserver des trajets'),
                               leading: Radio<String>(
                                 value: 'client',
                                 groupValue: userType,
@@ -165,6 +177,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           Expanded(
                             child: ListTile(
                               title: const Text('Chauffeur'),
+                              subtitle: const Text('Proposer des trajets'),
                               leading: Radio<String>(
                                 value: 'chauffeur',
                                 groupValue: userType,
@@ -186,23 +199,34 @@ class _RegisterScreenState extends State<RegisterScreen> {
               // --- Champs spécifiques chauffeur ---
               if (userType == 'chauffeur') ...[
                 const SizedBox(height: 20),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 8),
+                  child: Text(
+                    'Informations chauffeur (obligatoires)',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.blue),
+                  ),
+                ),
+                const SizedBox(height: 10),
                 CustomTextField(
                   controller: phoneController,
-                  label: "Numéro de téléphone",
+                  label: "Numéro de téléphone *",
                   keyboardType: TextInputType.phone,
                 ),
                 const SizedBox(height: 20),
                 CustomTextField(
                   controller: vehicleTypeController,
-                  label: "Type de véhicule",
+                  label: "Type de véhicule *",
                   keyboardType: TextInputType.text,
+                  hintText: "Ex: Peugeot 308, Renault Clio...",
                 ),
                 const SizedBox(height: 20),
                 CustomTextField(
                   controller: licensePlateController,
-                  label: "Plaque d'immatriculation",
+                  label: "Plaque d'immatriculation *",
                   keyboardType: TextInputType.text,
+                  hintText: "Ex: AB-123-CD",
                 ),
+                const SizedBox(height: 10),
               ],
 
               const SizedBox(height: 30),
