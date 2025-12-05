@@ -1,21 +1,18 @@
-// providers/notification_provider.dart
 import 'package:flutter/foundation.dart';
 import '../services/api_service.dart';
 import '../models/ride.dart';
 
 class NotificationProvider with ChangeNotifier {
-  List<Ride> _userRides = []; // Tous les trajets de l'utilisateur
+  List<Ride> _userRides = []; 
   bool _hasNewNotification = false;
 
   List<Ride> get userRides => _userRides;
   bool get hasNewNotification => _hasNewNotification;
 
-  // Récupérer TOUS les trajets de l'utilisateur
   Future<void> checkForAcceptedRides() async {
     try {
       final allRides = await ApiService.getUserRides();
       
-      // Vérifier s'il y a de nouveaux trajets acceptés
       final newAcceptedRides = allRides.where((ride) => 
           ride.status == 'accepted' && 
           !_userRides.any((r) => r.id == ride.id && r.status == 'accepted')
@@ -33,7 +30,6 @@ class NotificationProvider with ChangeNotifier {
     }
   }
 
-  // Getters par statut
   List<Ride> get acceptedRides => _userRides.where((ride) => ride.status == 'accepted').toList();
   List<Ride> get inProgressRides => _userRides.where((ride) => ride.status == 'in_progress').toList();
   List<Ride> get completedRides => _userRides.where((ride) => ride.status == 'completed').toList();
@@ -49,7 +45,6 @@ class NotificationProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // Charger initialement les trajets
   Future<void> loadUserRides() async {
     try {
       _userRides = await ApiService.getUserRides();

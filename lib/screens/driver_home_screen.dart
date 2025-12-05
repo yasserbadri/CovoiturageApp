@@ -106,20 +106,15 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
           physics: const AlwaysScrollableScrollPhysics(),
           child: Column(
             children: [
-              // Bannière de notification
               if (notificationProvider.hasNewNotification)
                 _buildNotificationBanner(notificationProvider),
 
-              // Statistiques du chauffeur
               _buildDriverStats(notificationProvider, ratingProvider),
               
-              // Section des notes
               _buildRatingSection(ratingProvider),
 
-              // Actions rapides
               _buildQuickActions(),
 
-              // Trajets en cours
               if (notificationProvider.inProgressRides.isNotEmpty) ...[
                 const SizedBox(height: 16),
                 _buildSectionTitle('Trajets en Cours', Icons.directions_car, Colors.green),

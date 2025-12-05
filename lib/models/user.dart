@@ -22,7 +22,6 @@ class User {
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
-    // Gestion sécurisée du rating qui peut être String ou double
     double? parseRating(dynamic ratingValue) {
       if (ratingValue == null) return null;
       if (ratingValue is double) return ratingValue;
@@ -33,7 +32,6 @@ class User {
       return null;
     }
 
-    // Gestion sécurisée des autres champs
     return User(
       id: json['id']?.toString() ?? '',
       name: json['name']?.toString() ?? '',

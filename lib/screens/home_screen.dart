@@ -22,7 +22,6 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Carte rapide
             Card(
               child: Padding(
                 padding: const EdgeInsets.all(16),

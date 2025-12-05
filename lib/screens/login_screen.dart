@@ -58,7 +58,6 @@ class _LoginScreenState extends State<LoginScreen> {
         SnackBar(content: Text('Connexion réussie! Bienvenue ${user.name}')),
       );
       
-      // Redirection selon le rôle
       _redirectBasedOnRole(user);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -69,10 +68,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _redirectBasedOnRole(User user) {
     if (user.userType == 'chauffeur') {
-      // Rediriger vers l'écran chauffeur
       Navigator.pushReplacementNamed(context, AppRoutes.driverHome);
     } else {
-      // Rediriger vers l'écran client (par défaut)
       Navigator.pushReplacementNamed(context, AppRoutes.clientHome);
     }
   }

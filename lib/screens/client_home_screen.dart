@@ -39,7 +39,6 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
         });
       });
 
-      // Charger les trajets de l'utilisateur
       notificationProvider.loadUserRides();
     });
   }
@@ -48,11 +47,9 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
     final rideProvider = Provider.of<RideProvider>(context, listen: false);
     
     if (_departController.text.isEmpty && _destinationController.text.isEmpty) {
-      // Si les champs sont vides, charger tous les trajets
       rideProvider.loadAvailableRides();
     } else {
-      // Filtrer les trajets localement (pour l'instant)
-      // Plus tard, vous pourrez implémenter une recherche backend
+     
       _filterRidesLocally();
     }
   }
@@ -67,8 +64,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
       return matchesDepart && matchesDestination;
     }).toList();
 
-    // Pour l'instant, on filtre juste localement
-    // Vous verrez les résultats en temps réel grâce au Provider
+    
   }
 
   // Dans ClientHomeScreen, ajoutez cette méthode :
@@ -92,7 +88,6 @@ void _showRatingDialog(Ride ride) {
                 ),
                 const SizedBox(height: 20),
                 
-                // Étoiles de notation
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: List.generate(5, (index) {
@@ -176,7 +171,6 @@ void _showRatingDialog(Ride ride) {
       appBar: AppBar(
         title: const Text('Covoiturage - Passager'),
         actions: [
-          // Badge de notification pour les trajets acceptés
           Stack(
             children: [
               IconButton(
@@ -557,7 +551,6 @@ Widget _buildRideListTile(Ride ride) {
 }
 
 bool _hasRatedRide(String rideId) {
-  // Vérifier si l'utilisateur a déjà noté ce trajet
   final ratingProvider = Provider.of<RatingProvider>(context, listen: false);
   return ratingProvider.userRatings.any((rating) => rating.rideId == rideId);
 }

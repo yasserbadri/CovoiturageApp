@@ -57,7 +57,6 @@ class RideProvider with ChangeNotifier {
       final newRide = await ApiService.createRide(ride);
       if (newRide != null) {
         _currentRide = newRide;
-        // Recharger les trajets disponibles
         await loadAvailableRides();
         _isLoading = false;
         notifyListeners();
@@ -78,9 +77,7 @@ class RideProvider with ChangeNotifier {
     try {
       final success = await ApiService.acceptRide(rideId);
       if (success) {
-        // Retirer le trajet de la liste des disponibles
         _availableRides.removeWhere((ride) => ride.id == rideId);
-        // Recharger les trajets de l'utilisateur
         await loadUserRides();
         notifyListeners();
         return true;
@@ -93,7 +90,6 @@ class RideProvider with ChangeNotifier {
     return false;
   }
 
-  // Charger des données de test
   void _loadTestRides() {
     _availableRides = [
       Ride(

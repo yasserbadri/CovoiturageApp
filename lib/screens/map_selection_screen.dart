@@ -141,7 +141,6 @@ class _MapSelectionScreenState extends State<MapSelectionScreen> {
                     ),
                   ],
                 ),
-                // Adresse sélectionnée
                 Positioned(
                   top: 16,
                   left: 16,
@@ -163,7 +162,6 @@ class _MapSelectionScreenState extends State<MapSelectionScreen> {
                     ),
                   ),
                 ),
-                // Bouton position actuelle
                 Positioned(
                   bottom: 16,
                   right: 16,

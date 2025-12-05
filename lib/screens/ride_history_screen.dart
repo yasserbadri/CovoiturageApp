@@ -14,7 +14,6 @@ class _RideHistoryScreenState extends State<RideHistoryScreen> {
   @override
   void initState() {
     super.initState();
-    // Charger les trajets au démarrage
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final notificationProvider = Provider.of<NotificationProvider>(context, listen: false);
       notificationProvider.loadUserRides();

@@ -10,14 +10,14 @@ class ApiService {
 
   // Méthode : Gestion centralisée des réponses
   static dynamic _handleResponse(http.Response response) {
-    print('📡 Status: ${response.statusCode}');
-    print('📦 Response: ${response.body}');
+    print(' Status: ${response.statusCode}');
+    print(' Response: ${response.body}');
 
     if (response.statusCode >= 200 && response.statusCode < 300) {
       if (response.body.isEmpty) return true; // Pour les réponses sans contenu
       return jsonDecode(response.body);
     } else {
-      print('❌ Erreur HTTP: ${response.statusCode}');
+      print(' Erreur HTTP: ${response.statusCode}');
       return null;
     }
   }
@@ -28,7 +28,7 @@ class ApiService {
       final prefs = await SharedPreferences.getInstance();
       return prefs.getString('auth_token');
     } catch (e) {
-      print('❌ Erreur récupération token: $e');
+      print(' Erreur récupération token: $e');
       return null;
     }
   }
@@ -38,7 +38,7 @@ class ApiService {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('auth_token', token);
     } catch (e) {
-      print('❌ Erreur sauvegarde token: $e');
+      print(' Erreur sauvegarde token: $e');
     }
   }
 
@@ -47,7 +47,7 @@ class ApiService {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove('auth_token');
     } catch (e) {
-      print('❌ Erreur suppression token: $e');
+      print(' Erreur suppression token: $e');
     }
   }
 
@@ -64,7 +64,7 @@ class ApiService {
   // Authentification
   static Future<Map<String, dynamic>?> login(String email, String password) async {
     try {
-      print('🔄 Tentative de connexion: $email');
+      print(' Tentative de connexion: $email');
       
       final response = await http.post(
         Uri.parse('$baseUrl/auth/login'),
@@ -78,7 +78,7 @@ class ApiService {
       final data = _handleResponse(response);
       if (data != null) {
         await _saveToken(data['token']);
-        print('✅ Connexion réussie!');
+        print(' Connexion réussie!');
         return {
           'user': User.fromJson(data['user']),
           'token': data['token'],
@@ -86,7 +86,7 @@ class ApiService {
       }
       return null;
     } catch (e) {
-      print('❌ Erreur de connexion: $e');
+      print(' Erreur de connexion: $e');
       return null;
     }
   }
@@ -101,7 +101,7 @@ class ApiService {
     String? licensePlate,
   }) async {
     try {
-      print('🔄 Tentative d\'inscription: $email en tant que $userType');
+      print(' Tentative d\'inscription: $email en tant que $userType');
 
       final Map<String, dynamic> body = {
         'name': name,
@@ -123,7 +123,7 @@ class ApiService {
         }
       }
 
-      print('📦 Body envoyé: $body');
+      print(' Body envoyé: $body');
 
       final response = await http.post(
         Uri.parse('$baseUrl/auth/register'),
@@ -131,36 +131,36 @@ class ApiService {
         body: jsonEncode(body),
       );
 
-      print('📡 Status: ${response.statusCode}');
-      print('📦 Response: ${response.body}');
+      print(' Status: ${response.statusCode}');
+      print(' Response: ${response.body}');
 
       if (response.statusCode == 201 || response.statusCode == 200) {
         final data = jsonDecode(response.body);
         await _saveToken(data['token']);
-        print('✅ Inscription réussie pour $userType');
+        print(' Inscription réussie pour $userType');
         return {
           'user': User.fromJson(data['user']),
           'token': data['token'],
         };
       } else {
-        print('❌ Erreur HTTP: ${response.statusCode}');
+        print(' Erreur HTTP: ${response.statusCode}');
         return null;
       }
     } catch (e) {
-      print('❌ Erreur d\'inscription: $e');
+      print(' Erreur d\'inscription: $e');
       return null;
     }
   }
 
   static Future<void> logout() async {
     await _removeToken();
-    print('✅ Déconnexion réussie');
+    print(' Déconnexion réussie');
   }
 
   // Récupérer les trajets disponibles
   static Future<List<Ride>> getAvailableRides() async {
     try {
-      print('🔄 Récupération des trajets disponibles...');
+      print(' Récupération des trajets disponibles...');
       
       final response = await http.get(
         Uri.parse('$baseUrl/rides/available'),
@@ -170,12 +170,12 @@ class ApiService {
       final data = _handleResponse(response);
       if (data != null && data['rides'] != null) {
         final rides = (data['rides'] as List).map((ride) => Ride.fromJson(ride)).toList();
-        print('✅ ${rides.length} trajets récupérés');
+        print(' ${rides.length} trajets récupérés');
         return rides;
       }
       return [];
     } catch (e) {
-      print('❌ Erreur récupération trajets: $e');
+      print(' Erreur récupération trajets: $e');
       return [];
     }
   }
@@ -189,7 +189,7 @@ class ApiService {
       );
       return response.statusCode == 200;
     } catch (e) {
-      print('❌ Backend non accessible: $e');
+      print(' Backend non accessible: $e');
       return false;
     }
   }
@@ -197,7 +197,7 @@ class ApiService {
   // Méthode pour créer un trajet
   static Future<Ride?> createRide(Ride ride) async {
     try {
-      print('🔄 Création d\'un trajet...');
+      print(' Création d\'un trajet...');
       
       final response = await http.post(
         Uri.parse('$baseUrl/rides'),
@@ -217,12 +217,12 @@ class ApiService {
 
       final data = _handleResponse(response);
       if (data != null && data['ride'] != null) {
-        print('✅ Trajet créé avec succès');
+        print(' Trajet créé avec succès');
         return Ride.fromJson(data['ride']);
       }
       return null;
     } catch (e) {
-      print('❌ Erreur création trajet: $e');
+      print(' Erreur création trajet: $e');
       return null;
     }
   }
@@ -230,7 +230,7 @@ class ApiService {
   // Méthode pour accepter un trajet
   static Future<bool> acceptRide(String rideId) async {
     try {
-      print('🔄 Acceptation du trajet $rideId...');
+      print(' Acceptation du trajet $rideId...');
       
       final response = await http.post(
         Uri.parse('$baseUrl/rides/$rideId/accept'),
@@ -239,12 +239,12 @@ class ApiService {
 
       final data = _handleResponse(response);
       if (data != null) {
-        print('✅ Trajet accepté avec succès');
+        print(' Trajet accepté avec succès');
         return true;
       }
       return false;
     } catch (e) {
-      print('❌ Erreur acceptation trajet: $e');
+      print(' Erreur acceptation trajet: $e');
       return false;
     }
   }
@@ -252,7 +252,7 @@ class ApiService {
   // Méthode pour récupérer les trajets de l'utilisateur
   static Future<List<Ride>> getUserRides() async {
     try {
-      print('🔄 Récupération des trajets utilisateur...');
+      print(' Récupération des trajets utilisateur...');
       
       final response = await http.get(
         Uri.parse('$baseUrl/rides/my-rides'),
@@ -262,12 +262,12 @@ class ApiService {
       final data = _handleResponse(response);
       if (data != null && data['rides'] != null) {
         final rides = (data['rides'] as List).map((ride) => Ride.fromJson(ride)).toList();
-        print('✅ ${rides.length} trajets utilisateur récupérés');
+        print(' ${rides.length} trajets utilisateur récupérés');
         return rides;
       }
       return [];
     } catch (e) {
-      print('❌ Erreur récupération trajets utilisateur: $e');
+      print(' Erreur récupération trajets utilisateur: $e');
       return [];
     }
   }
@@ -275,7 +275,7 @@ class ApiService {
   // Mettre à jour le statut d'un trajet
   static Future<bool> updateRideStatus(String rideId, String status) async {
     try {
-      print('🔄 Mise à jour du statut du trajet $rideId: $status');
+      print(' Mise à jour du statut du trajet $rideId: $status');
       
       final response = await http.patch(
         Uri.parse('$baseUrl/rides/$rideId/status'),
@@ -285,12 +285,12 @@ class ApiService {
 
       final data = _handleResponse(response);
       if (data != null) {
-        print('✅ Statut mis à jour: $status');
+        print(' Statut mis à jour: $status');
         return true;
       }
       return false;
     } catch (e) {
-      print('❌ Erreur mise à jour statut: $e');
+      print(' Erreur mise à jour statut: $e');
       return false;
     }
   }
@@ -309,14 +309,14 @@ class ApiService {
       }
       return null;
     } catch (e) {
-      print('❌ Erreur récupération utilisateur: $e');
+      print(' Erreur récupération utilisateur: $e');
       return null;
     }
   }
 
   static Future<bool> createRating(String rideId, int rating, String? comment) async {
     try {
-      print('🔄 Création d\'une notation pour le trajet $rideId...');
+      print(' Création d\'une notation pour le trajet $rideId...');
       
       final response = await http.post(
         Uri.parse('$baseUrl/ratings'),
@@ -330,19 +330,19 @@ class ApiService {
 
       final data = _handleResponse(response);
       if (data != null) {
-        print('✅ Notation créée avec succès');
+        print(' Notation créée avec succès');
         return true;
       }
       return false;
     } catch (e) {
-      print('❌ Erreur création notation: $e');
+      print(' Erreur création notation: $e');
       return false;
     }
   }
 
   static Future<List<Rating>> getUserRatings() async {
     try {
-      print('🔄 Récupération des notations utilisateur...');
+      print(' Récupération des notations utilisateur...');
       
       final response = await http.get(
         Uri.parse('$baseUrl/ratings/my-ratings'),
@@ -352,12 +352,12 @@ class ApiService {
       final data = _handleResponse(response);
       if (data != null && data['ratings'] != null) {
         final ratings = (data['ratings'] as List).map((rating) => Rating.fromJson(rating)).toList();
-        print('✅ ${ratings.length} notations récupérées');
+        print(' ${ratings.length} notations récupérées');
         return ratings;
       }
       return [];
     } catch (e) {
-      print('❌ Erreur récupération notations: $e');
+      print(' Erreur récupération notations: $e');
       return [];
     }
   }
@@ -385,7 +385,7 @@ class ApiService {
       final data = _handleResponse(response);
       return data != null;
     } catch (e) {
-      print('❌ Erreur mise à jour profil: $e');
+      print(' Erreur mise à jour profil: $e');
       return false;
     }
   }
@@ -400,7 +400,7 @@ class ApiService {
       var response = await request.send();
       return response.statusCode == 200;
     } catch (e) {
-      print('❌ Erreur upload image: $e');
+      print(' Erreur upload image: $e');
       return false;
     }
   }
